@@ -79,45 +79,58 @@ const TextConverter: React.FC<TextConverterProps> = ({ onInsertRequest }) => {
   }, [onInsertRequest]);
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col flex-1">
-        <div className="p-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-          <h3 className="text-sm font-semibold text-gray-700">編輯區</h3>
-          <span className="text-xs text-gray-500 hidden sm:inline">支援 Markdown 風格縮排與空行</span>
+    <div className="flex flex-col h-full min-h-0">
+      <div className="glass-card overflow-hidden flex flex-col flex-1 relative min-h-0" style={{ borderRadius: 'var(--radius)', display: 'flex', flexDirection: 'column' }}>
+        {/* Header */}
+        <div className="card-header flex justify-between items-center relative flex-none">
+          <h3 className="text-sm font-semibold" style={{ color: 'hsl(var(--foreground))' }}>編輯區</h3>
+          <span className="text-xs hidden sm:inline" style={{ color: 'hsl(var(--muted-foreground))' }}>支援 Markdown 風格縮排與空行</span>
         </div>
         
-        <textarea
-          ref={textareaRef}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="在此貼上或輸入文字..."
-          className="flex-1 w-full p-4 resize-none outline-none text-base leading-relaxed font-sans placeholder-gray-400 focus:bg-blue-50/10 transition-colors custom-scrollbar min-h-[300px]"
-        />
+        {/* Textarea Container */}
+        <div 
+          className="flex flex-col"
+          style={{ 
+            height: '400px',
+            overflow: 'hidden'
+          }}
+        >
+          <textarea
+            ref={textareaRef}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="在此貼上或輸入文字..."
+            className="w-full p-4 resize-none outline-none text-base leading-relaxed font-sans custom-scrollbar transition-all"
+            style={{ 
+              color: 'hsl(var(--foreground))',
+              background: 'hsl(var(--card))',
+              height: '100%',
+              boxSizing: 'border-box'
+            }}
+          />
+        </div>
         
-        <div className="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-3 flex-wrap">
+        {/* Footer - 固定在底部 */}
+        <div className="p-4 border-t flex items-center justify-between gap-3 flex-wrap flex-none relative z-10" style={{ borderColor: 'hsl(var(--border) / 0.5)', background: 'hsl(var(--muted) / 0.3)' }}>
            <div className="flex gap-2">
              <button
               onClick={handleConvert}
               disabled={!text}
-              className={`px-6 py-2.5 rounded-lg font-medium text-white shadow-md transition-all
-                ${!text 
-                  ? 'bg-gray-300 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-95 shadow-blue-500/20'
-                }`}
+              className="btn-primary"
             >
               轉換並複製
             </button>
             <button
               onClick={handleClear}
               disabled={!text}
-              className="px-4 py-2.5 rounded-lg font-medium text-gray-600 bg-white border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-secondary"
             >
               清空
             </button>
            </div>
 
            {status && (
-             <span className="text-green-600 font-medium text-sm animate-fade-in flex items-center">
+             <span className="font-medium text-sm animate-fade-in flex items-center" style={{ color: 'hsl(var(--secondary))' }}>
                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                {status}
              </span>

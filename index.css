@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap');
+
+:root {
+  --background: 220 25% 97%;
+  --foreground: 220 30% 15%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 220 30% 15%;
+
+  --primary: 220 80% 50%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 175 70% 45%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 220 15% 92%;
+  --muted-foreground: 220 15% 45%;
+
+  --accent: 175 60% 50%;
+  --accent-foreground: 0 0% 100%;
+
+  --border: 220 20% 88%;
+  --input: 220 20% 88%;
+  --ring: 220 80% 50%;
+
+  --radius: 0.75rem;
+
+  /* Custom tokens */
+  --gradient-primary: linear-gradient(135deg, hsl(220, 80%, 50%) 0%, hsl(200, 85%, 55%) 100%);
+  --gradient-secondary: linear-gradient(135deg, hsl(175, 70%, 45%) 0%, hsl(195, 75%, 50%) 100%);
+  --gradient-bg: linear-gradient(180deg, hsl(220, 25%, 97%) 0%, hsl(220, 20%, 93%) 100%);
+  --shadow-card: 0 4px 24px -4px hsl(220 30% 15% / 0.08);
+  --shadow-elevated: 0 12px 40px -12px hsl(220 30% 15% / 0.15);
+  --shadow-glow: 0 0 30px hsl(220 80% 50% / 0.2);
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+  background: var(--gradient-bg);
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+}
+
+.glass-card {
+  background: hsl(var(--card));
+  border-radius: calc(var(--radius) * 2);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(10px);
+  transition: box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  box-shadow: var(--shadow-elevated);
+}
+
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: hsl(var(--primary-foreground));
+  padding: 0.625rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px -4px hsl(var(--primary) / 0.3);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -4px hsl(var(--primary) / 0.4);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: hsl(var(--muted));
+  border-color: hsl(var(--accent));
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.card-header {
+  background: hsl(var(--muted) / 0.5);
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 0.75rem 1rem;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: hsl(var(--muted) / 0.3);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+textarea::placeholder {
+  color: hsl(var(--muted-foreground) / 0.5);
+}
+
+textarea:focus {
+  outline: none;
+  background: hsl(var(--muted) / 0.2);
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(var(--primary) / 0.35);
+  }
+}
+
