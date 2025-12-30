@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SYMBOL_CATEGORIES } from '../constants';
 import { SymbolItem, SymbolCategory } from '../types';
 
@@ -9,21 +9,76 @@ interface SymbolPickerProps {
 
 const RECENT_CATEGORY_ID = 'recently_used';
 const MAX_RECENT_ITEMS = 20;
+const STORAGE_KEY = 'fb_converter_recents';
+
+// Helper function to check if localStorage is available
+const isLocalStorageAvailable = (): boolean => {
+  try {
+    const test = '__localStorage_test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+// Helper function to safely get from localStorage
+const getFromStorage = (): SymbolItem[] => {
+  if (!isLocalStorageAvailable()) {
+    return [];
+  }
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load recents from localStorage', e);
+  }
+  return [];
+};
+
+// Helper function to safely save to localStorage
+const saveToStorage = (items: SymbolItem[]): void => {
+  if (!isLocalStorageAvailable()) {
+    console.warn('localStorage is not available, recent items will not be persisted');
+    return;
+  }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch (e) {
+    console.error('Failed to save recents to localStorage', e);
+    // Try to handle quota exceeded error
+    if (e instanceof DOMException && (e.code === 22 || e.code === 1014 || e.name === 'QuotaExceededError')) {
+      console.warn('localStorage quota exceeded, clearing old items');
+      try {
+        // Try to save with fewer items
+        const reducedItems = items.slice(0, Math.floor(MAX_RECENT_ITEMS / 2));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(reducedItems));
+      } catch (e2) {
+        console.error('Failed to save even with reduced items', e2);
+      }
+    }
+  }
+};
 
 const SymbolPicker: React.FC<SymbolPickerProps> = ({ onSelect, isMobileMode = false }) => {
   const [activeTab, setActiveTab] = useState(RECENT_CATEGORY_ID);
   const [recentItems, setRecentItems] = useState<SymbolItem[]>([]);
+  const isMountedRef = useRef(true);
 
   // Load recently used from localStorage on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('fb_converter_recents');
-      if (stored) {
-        setRecentItems(JSON.parse(stored));
-      }
-    } catch (e) {
-      console.error('Failed to load recents', e);
+    isMountedRef.current = true;
+    const items = getFromStorage();
+    if (isMountedRef.current) {
+      setRecentItems(items);
     }
+    
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
 
   const handleSelect = (item: SymbolItem) => {
@@ -32,19 +87,16 @@ const SymbolPicker: React.FC<SymbolPickerProps> = ({ onSelect, isMobileMode = fa
   };
 
   const addToRecent = (item: SymbolItem) => {
-    setRecentItems((prev) => {
-      // Remove if exists to push to front
-      const filtered = prev.filter((i) => i.char !== item.char);
-      const newRecents = [item, ...filtered].slice(0, MAX_RECENT_ITEMS);
-      
-      // Persist
-      try {
-        localStorage.setItem('fb_converter_recents', JSON.stringify(newRecents));
-      } catch (e) {
-        console.error('Failed to save recents', e);
-      }
-      return newRecents;
-    });
+    // Calculate new recents immediately (synchronously)
+    const currentItems = recentItems.length > 0 ? recentItems : getFromStorage();
+    const filtered = currentItems.filter((i) => i.char !== item.char);
+    const newRecents = [item, ...filtered].slice(0, MAX_RECENT_ITEMS);
+    
+    // Save to localStorage immediately (before state update)
+    saveToStorage(newRecents);
+    
+    // Update state
+    setRecentItems(newRecents);
   };
 
   // Construct display categories including "Recently Used"
